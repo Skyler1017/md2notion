@@ -197,7 +197,6 @@ def cli(argv):
     client = NotionClient(token_v2=args.token_v2)
     print("Getting target PageBlock...")
     page = client.get_block(args.page_url)
-    uploadPage = page
 
     for path in args.md_path_url:
         print(path)
