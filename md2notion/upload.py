@@ -199,17 +199,46 @@ def cli(argv):
     page = client.get_block(args.page_url)
     uploadPage = page
 
-    for mdPath, mdFileName, mdFile in filesFromPathsUrls(args.md_path_url):
+    for path in args.md_path_url:
+        print(path)
+        walk(page, path, args, notionPyRendererCls)
+
+
+def walk(parent_page, path, args, notionPyRendererCls):
+    print(path)
+    if os.path.isfile(path) or os.path.islink(path):
+        if not os.path.basename(path).endswith(".md"):
+            return
+        md_title = os.path.basename(path).replace(".md", "")
+        if os.path.basename(path) == ".DS_Store":
+            return
         if args.mode == 'create' or args.mode == 'clear':
             # Clear any old pages if it's a PageBlock that has the same name
             if args.mode == 'clear':
-                for child in [c for c in page.children if isinstance(c, PageBlock) and c.title == mdFileName]:
+                for child in [c for c in parent_page.children if isinstance(c, PageBlock) and c.title == md_title]:
                     print(f"Removing previous {child.title}...")
                     child.remove()
-            # Make the new page in Notion.so
-            uploadPage = page.children.add_new(PageBlock, title=mdFileName)
-        print(f"Uploading {mdPath} to Notion.so at page {uploadPage.title}...")
-        upload(mdFile, uploadPage, None, notionPyRendererCls)
+        uploadPage = parent_page.children.add_new(PageBlock, title=md_title)
+        print(f"Uploading {path} to Notion.so at page {md_title}...")
+        with open(path, "r", encoding="utf-8") as file:
+            upload(file, uploadPage, None, notionPyRendererCls)
+        return
+
+    dir_name = os.path.basename(path)
+    if dir_name == "media":
+        return
+    print("检查到文件夹", dir_name, "创建页面")
+    if args.mode == 'create' or args.mode == 'clear':
+        # Clear any old pages if it's a PageBlock that has the same name
+        if args.mode == 'clear':
+            for child in [c for c in parent_page.children if isinstance(c, PageBlock) and c.title == dir_name]:
+                print(f"Removing previous {child.title}...")
+                child.remove()
+    page = parent_page.children.add_new(PageBlock, title=dir_name)
+    children = os.listdir(path)
+    print(children)
+    for child in children:
+        walk(page, path+'/'+child, args, notionPyRendererCls)
 
 
 if __name__ == "__main__":
