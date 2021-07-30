@@ -10,9 +10,9 @@
 将一个文件夹的所有`.md`文件按文件夹结构迁移到 notion，保留代码高亮(c python go)
 
 ## 使用方法
-1. 创建一个页面，复制链接（右上角 copy link）
-2. 打开 notion.so 进入开发者模式，打开cookie，token_v2 字段
-3. 复制markdown文件夹的绝对路径
+1. 在notion中创建一个页面，复制链接（右上角 copy link）
+2. 打开 [notion 网页版](notion.so) 链接,进入开发者模式，打开cookie，复制下 token_v2 字段
+3. 复制 markdown文件夹的绝对路径，如 /Users/you/md-folder
 4. 运行下面的命令：
 ```
 git clone https://github.com/Skyler1017/md2notion.git
